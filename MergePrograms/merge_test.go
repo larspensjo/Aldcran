@@ -18,7 +18,6 @@
 package merge
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -43,9 +42,18 @@ func TestEditGraph(t *testing.T) {
 	x := program{1, 2}
 	y := program{1, 2, 3}
 	graph := findMatchPoints(x, y)
-	fmt.Println(graph)
 	expect := edit_graph{{true, false}, {false, true}, {false, false}}
 	if !compareEditGraphs(expect, graph) {
 		t.Error("Expcedt:", expect, "got", graph)
+	}
+}
+
+func TestFindPathEmpty(t *testing.T) {
+	x := program{1}
+	y := program{1}
+	graph := findMatchPoints(x, y)
+	cost, p := findShortestPathButeForce(graph, 0, 0)
+	if cost != 0 || p == nil {
+		t.Error("Expected cost 0, got", cost)
 	}
 }
