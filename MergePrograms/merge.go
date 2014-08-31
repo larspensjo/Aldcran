@@ -111,12 +111,12 @@ func (p path) randomMerge(p1, p2 program) (newProg program) {
 		}
 		if p[i] == right {
 			if chooseX {
-				newProg = append(newProg, p1[x])
+				newProg = append(newProg, p2[x])
 			}
 			x++
 		} else if p[i] == down {
 			if !chooseX {
-				newProg = append(newProg, p2[y])
+				newProg = append(newProg, p1[y])
 			}
 			y++
 		}
@@ -126,11 +126,15 @@ func (p path) randomMerge(p1, p2 program) (newProg program) {
 
 func Test() {
 	rand.Seed(1) // Get the same behaviour every time
-	x := program{1, 2, 3, 4, 5, 6, 7, 8}
-	y := program{1, 9, 3, 0, 5, 0, 7, 0}
+	x := program{0, 1, 2, 3, 4, 5}
+	fmt.Println("Program 1:", x)
+	y := program{0, 1, 6, 3}
+	fmt.Println("Program 2:", y)
 	graph := findMatchPoints(y, x)
 	cost, p := findShortestPathButeForce(graph, 0, 0)
 	fmt.Println("Testing, cost", cost, "path", p)
-	newProg := p.randomMerge(x, y)
-	fmt.Println("Randomized:", newProg)
+	for i := 0; i < 20; i++ {
+		newProg := p.randomMerge(x, y)
+		fmt.Println("Randomized:", newProg)
+	}
 }
