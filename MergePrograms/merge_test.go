@@ -74,6 +74,7 @@ func TestFindPathEqual(t *testing.T) {
 	}
 }
 
+// Tests where everything differs
 func TestFindPathDifferent(t *testing.T) {
 	var x, y program
 	var graph edit_graph
@@ -107,6 +108,56 @@ func TestFindPathDifferent(t *testing.T) {
 	graph = findMatchPoints(x, y)
 	cost, p = findShortestPathButeForce(graph, 0, 0)
 	expCost = len(x) + len(y)
+	if cost != expCost || p == nil {
+		t.Error("Expected cost", expCost, "got", cost)
+	}
+}
+
+func TestFindPathMixed(t *testing.T) {
+	var x, y program
+	var graph edit_graph
+
+	x = program{1, 2}
+	y = program{1, 3}
+	graph = findMatchPoints(x, y)
+	cost, p := findShortestPathButeForce(graph, 0, 0)
+	expCost := 2
+	if cost != expCost || p == nil {
+		t.Error("Expected cost", expCost, "got", cost)
+	}
+
+	x = program{1, 3}
+	y = program{2, 3}
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	expCost = 2
+	if cost != expCost || p == nil {
+		t.Error("Expected cost", expCost, "got", cost)
+	}
+
+	x = program{1, 2, 3}
+	y = program{1, 4, 5}
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	expCost = 4
+	if cost != expCost || p == nil {
+		t.Error("Expected cost", expCost, "got", cost)
+	}
+
+	x = program{1, 2, 3}
+	y = program{1, 4, 3}
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	expCost = 2
+	if cost != expCost || p == nil {
+		t.Error("Expected cost", expCost, "got", cost)
+	}
+
+	x = program{'a', 'b', 'c', 'a', 'b', 'b', 'a'}
+	y = program{'c', 'b', 'a', 'b', 'a', 'c'}
+	graph = findMatchPoints(y, x)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	expCost = 5
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
 	}
