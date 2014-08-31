@@ -55,16 +55,12 @@ func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
 		}
 		return
 	}
-	if x == len(gr) {
+	if x == len(gr[0]) {
 		p = path{}
 		for ; y < len(gr); y++ {
 			cost++
 			p = append(p, down)
 		}
-		return
-	}
-	if y == len(gr)-1 && x == len(gr[0])-1 {
-		p = path{diag}
 		return
 	}
 	if gr[y][x] {
@@ -73,19 +69,8 @@ func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
 		p = append(path{diag}, rest...)
 		return
 	}
-	addCost1 := len(gr[0]) + 1
-	addCost2 := len(gr) + 1
-	var rest1, rest2 path
-	if y == len(gr) {
-		// Can't go further down
-		addCost1, rest1 = findShortestPathButeForce(gr, x+1, y)
-	} else if x == len(gr[0]) {
-		// Can't go further right
-		addCost2, rest2 = findShortestPathButeForce(gr, x, y+1)
-	} else {
-		addCost1, rest1 = findShortestPathButeForce(gr, x+1, y)
-		addCost2, rest2 = findShortestPathButeForce(gr, x, y+1)
-	}
+	addCost1, rest1 := findShortestPathButeForce(gr, x+1, y)
+	addCost2, rest2 := findShortestPathButeForce(gr, x, y+1)
 	if addCost1 < addCost2 {
 		cost = addCost1 + 1
 		p = append(path{right}, rest1...)
