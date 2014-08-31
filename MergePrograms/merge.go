@@ -64,7 +64,7 @@ func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
 		return
 	}
 	if y == len(gr)-1 && x == len(gr[0])-1 {
-		p = path{}
+		p = path{diag}
 		return
 	}
 	if gr[y][x] {

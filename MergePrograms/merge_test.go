@@ -44,16 +44,50 @@ func TestEditGraph(t *testing.T) {
 	graph := findMatchPoints(x, y)
 	expect := edit_graph{{true, false}, {false, true}, {false, false}}
 	if !compareEditGraphs(expect, graph) {
-		t.Error("Expcedt:", expect, "got", graph)
+		t.Error("Expected:", expect, "got", graph)
 	}
 }
 
-func TestFindPathEmpty(t *testing.T) {
+func TestFindPathEqual(t *testing.T) {
 	x := program{1}
-	y := program{1}
+	y := x
 	graph := findMatchPoints(x, y)
 	cost, p := findShortestPathButeForce(graph, 0, 0)
-	if cost != 0 || p == nil {
+	if cost != 0 || len(p) != len(x) {
+		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
+	}
+
+	x = program{1, 2}
+	y = x
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	if cost != 0 || len(p) != len(x) {
+		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
+	}
+
+	x = program{1, 2, 3, 4, 5}
+	y = x
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	if cost != 0 || len(p) != len(x) {
+		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
+	}
+}
+
+func TestFindPathDifferent(t *testing.T) {
+	x := program{1}
+	y := program{2}
+	graph := findMatchPoints(x, y)
+	cost, p := findShortestPathButeForce(graph, 0, 0)
+	if cost != len(x) || p == nil {
 		t.Error("Expected cost 0, got", cost)
 	}
+
+	x = program{1, 2, 3, 4, 5}
+	graph = findMatchPoints(x, y)
+	cost, p = findShortestPathButeForce(graph, 0, 0)
+	if cost != len(x) || p == nil {
+		t.Error("Expected cost 0, got", cost)
+	}
+	t.Error(cost, p)
 }
