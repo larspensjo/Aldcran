@@ -18,6 +18,7 @@
 package merge
 
 import (
+	"math/rand"
 	"testing"
 )
 
@@ -160,5 +161,29 @@ func TestFindPathMixed(t *testing.T) {
 	expCost = 5
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
+	}
+}
+
+func TestMerge(t *testing.T) {
+	rand.Seed(1) // Get the same behaviour every time
+	x := program{1, 2, 3, 4, 5, 6, 7, 8}
+	y := program{1, 9, 3, 0, 5, 0, 7, 0}
+	graph := findMatchPoints(y, x)
+	cost, p := findShortestPathButeForce(graph, 0, 0)
+	t.Log("Cost between parents", cost)
+	for i := 0; i < 10; i++ {
+		newProg := p.randomMerge(x, y)
+		// Compare the child program to each of the parents. The difference to them should be
+		// less or same compared to the difference between the parents
+		graph := findMatchPoints(x, newProg)
+		newCost1, _ := findShortestPathButeForce(graph, 0, 0)
+		t.Log("Child prog", newProg, "cost", newCost1)
+
+		graph = findMatchPoints(y, newProg)
+		newCost2, _ := findShortestPathButeForce(graph, 0, 0)
+		if newCost1+newCost2 != cost {
+			t.Error("Invalid cost", newCost1, "+", newCost2, "!=", cost)
+		}
+		t.Log("Child prog", newProg, "cost", newCost2)
 	}
 }
