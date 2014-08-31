@@ -18,6 +18,11 @@
 // Based on http://www.xmailserver.org/diff2.pdf
 package merge
 
+import (
+	"fmt"
+	"math/rand"
+)
+
 type instruction int
 type program []instruction
 type edit_graph [][]bool
@@ -79,4 +84,53 @@ func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
 		p = append(path{down}, rest2...)
 	}
 	return
+}
+
+// Take a path, do a random merge transform on two programs, and return the new program
+func (p path) randomMerge(p1, p2 program) (newProg program) {
+	commonPath := true
+	newProg = program{}
+	var chooseX bool
+	var x, y int
+	for i := range p {
+		if p[i] == diag {
+			commonPath = true
+			newProg = append(newProg, p1[x])
+			x++
+			y++
+			continue
+		}
+		if commonPath {
+			// Detected a deviation that starts here
+			commonPath = false
+			if rand.Float32() > 0.5 {
+				chooseX = true
+			} else {
+				chooseX = false
+			}
+		}
+		if p[i] == right {
+			if chooseX {
+				newProg = append(newProg, p1[x])
+			}
+			x++
+		} else if p[i] == down {
+			if !chooseX {
+				newProg = append(newProg, p2[y])
+			}
+			y++
+		}
+	}
+	return
+}
+
+func Test() {
+	rand.Seed(1) // Get the same behaviour every time
+	x := program{1, 2, 3, 4, 5, 6, 7, 8}
+	y := program{1, 9, 3, 0, 5, 0, 7, 0}
+	graph := findMatchPoints(y, x)
+	cost, p := findShortestPathButeForce(graph, 0, 0)
+	fmt.Println("Testing, cost", cost, "path", p)
+	newProg := p.randomMerge(x, y)
+	fmt.Println("Randomized:", newProg)
 }
