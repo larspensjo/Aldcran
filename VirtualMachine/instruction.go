@@ -24,8 +24,9 @@ import (
 type instruction struct {
 }
 
-type subrouting struct {
-	id int // Identifying the subroutine
+type subroutine struct {
+	id     int32 // Identifying the subroutine
+	instrs []instruction
 }
 
 func main() {
