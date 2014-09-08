@@ -21,7 +21,19 @@ import (
 	"fmt"
 )
 
+type numberVM int32
+type register int32
+
+const (
+	ParClearThreshold numberVM = 100
+)
+
 type instruction struct {
+	clear         numberVM // Clear operand if > ParClearThreshold
+	addImmediate  numberVM
+	addIndirect   register
+	multImmdeiate numberVM
+	multIndirect  register
 }
 
 type subroutine struct {
