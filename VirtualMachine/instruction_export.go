@@ -18,43 +18,11 @@
 package vm
 
 import (
-	"bytes"
-	"fmt"
+	"github.com/larspensjo/go-monotonic-graycode"
 )
 
-const (
-	ParClearThreshold = 100
-)
+var mgcPointer *mgc.Mgc
 
-type instruction struct {
-	clear         int32 // Clear operand if > ParClearThreshold
-	addImmediate  int32
-	addIndirect   int32
-	multImmediate int32
-	multIndirect  int32
-}
-
-type program struct {
-	instructions []instruction
-}
-
-type subroutine struct {
-	id int32 // Identifying the subroutine
-	pr program
-}
-
-func (p *program) MarshalBinary() (data []byte, err error) {
-	buf := new(bytes.Buffer)
-	for _, ins := range p.instructions {
-		ins.encode(buf)
-	}
-	return buf.Bytes(), nil
-}
-
-func (i *instruction) encode(b *bytes.Buffer) {
-	mgcPointer.GetMgc(i.clear)
-}
-
-func main() {
-	fmt.Println("Hello World!")
+func Init(width uint32) {
+	mgcPointer = mgc.New(width)
 }

@@ -19,12 +19,11 @@ package main
 
 import (
 	"Aldcran/MergePrograms"
+	"Aldcran/VirtualMachine"
 	// "fmt"
-	"github.com/larspensjo/go-monotonic-graycode"
 )
 
 func main() {
-	mgc.Init(16)
-	// fmt.Println("Permutation", mgc.Pi(10))
+	vm.Init(16)
 	merge.Test()
 }
