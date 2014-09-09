@@ -18,27 +18,42 @@
 package vm
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/larspensjo/go-monotonic-graycode"
 )
 
-type numberVM int32
-type register int32
-
 const (
-	ParClearThreshold numberVM = 100
+	ParClearThreshold = 100
 )
 
 type instruction struct {
-	clear         numberVM // Clear operand if > ParClearThreshold
-	addImmediate  numberVM
-	addIndirect   register
-	multImmdeiate numberVM
-	multIndirect  register
+	clear         int32 // Clear operand if > ParClearThreshold
+	addImmediate  int32
+	addIndirect   int32
+	multImmediate int32
+	multIndirect  int32
+}
+
+type program struct {
+	instructions []instruction
 }
 
 type subroutine struct {
-	id     int32 // Identifying the subroutine
-	instrs []instruction
+	id int32 // Identifying the subroutine
+	pr program
+}
+
+func (p *program) MarshalBinary() (data []byte, err error) {
+	buf := new(bytes.Buffer)
+	for _, ins := range p.instructions {
+		ins.encode(buf)
+	}
+	return buf.Bytes(), nil
+}
+
+func (i *instruction) encode(b *bytes.Buffer) {
+	mgc.GetMgc(i.clear)
 }
 
 func main() {
