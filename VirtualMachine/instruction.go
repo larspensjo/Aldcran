@@ -18,7 +18,6 @@
 package vm
 
 import (
-	"bytes"
 	"fmt"
 )
 
@@ -36,23 +35,12 @@ type instruction struct {
 
 type program struct {
 	instructions []instruction
+	grayCode     *Mgc
 }
 
 type subroutine struct {
 	id int32 // Identifying the subroutine
 	pr program
-}
-
-func (p *program) MarshalBinary() (data []byte, err error) {
-	buf := new(bytes.Buffer)
-	for _, ins := range p.instructions {
-		ins.encode(buf)
-	}
-	return buf.Bytes(), nil
-}
-
-func (i *instruction) encode(b *bytes.Buffer) {
-	mgcPointer.GetMgc(i.clear)
 }
 
 func main() {
