@@ -19,6 +19,7 @@ package vm
 
 import (
 	"fmt"
+	"github.com/larspensjo/go-monotonic-graycode"
 )
 
 const (
@@ -35,7 +36,7 @@ type instruction struct {
 
 type program struct {
 	instructions []instruction
-	grayCode     *Mgc
+	grayCode     *mgc.Mgc
 }
 
 type subroutine struct {

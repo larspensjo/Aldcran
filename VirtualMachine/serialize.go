@@ -1,4 +1,4 @@
-// Copyright 2014 Lars Pensjö
+// Copyright 2014 Lars PensjÃ¶
 //
 // This file is part of Aldcran.
 //
@@ -20,6 +20,7 @@ package vm
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/larspensjo/go-monotonic-graycode"
 )
 
 func (p *program) MarshalBinary() (data []byte, err error) {
@@ -32,34 +33,34 @@ func (p *program) MarshalBinary() (data []byte, err error) {
 
 func (p *program) UnmarshalBinary(data []byte) error {
 	b := bytes.NewBuffer(data)
-	for b.len() > 0 {
-        i instruction
-        err := i.decode(b, p.grayCode)
-        if err != nil {
+	for b.Len() > 0 {
+		var i instruction
+		err := i.decode(b, p.grayCode)
+		if err != nil {
 			return err
-        }
-        p.instructions = append(p.instruction, i)
+		}
+		p.instructions = append(p.instructions, i)
 	}
 	return nil
 }
 
 // Take a binary number, convert it to mgc, and encode it into a 4-byte array
-func encodeMgc(number int32, b *bytes.Buffer, m *Mgc) {
+func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
 	converted := m.GetMgc(number)
 	binary.Write(b, binary.LittleEndian, converted)
 }
 
 // Given a byte string, convert to binary number
-func decodeMgc(b *bytes.Buffer, m *Mgc) (int32, error) {
+func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) (int32, error) {
 	var mgcNumber mgc.MgcNumber
 	err := binary.Read(b, binary.LittleEndian, &mgcNumber)
 	if err != nil {
-		return _, err
+		return 0, err
 	}
-	return m.GetInt(number), nil
+	return m.GetInt(mgcNumber), nil
 }
 
-func (i *instruction) encode(b *bytes.Buffer, m *Mgc) {
+func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
 	encodeMgc(i.clear, b, m)
 	encodeMgc(i.addImmediate, b, m)
 	encodeMgc(i.addIndirect, b, m)
@@ -67,25 +68,25 @@ func (i *instruction) encode(b *bytes.Buffer, m *Mgc) {
 	encodeMgc(i.multIndirect, b, m)
 }
 
-func (i *instruction) decode(b *bytes.Buffer, m *Mgc) error {
+func (i *instruction) decode(b *bytes.Buffer, m *mgc.Mgc) error {
 	var err error
 	// This has to be done in the opposite order to encode()
 	i.clear, err = decodeMgc(b, m)
-    if err != nil {
+	if err != nil {
 		return err
-    }
+	}
 	i.addImmediate, err = decodeMgc(b, m)
-    if err != nil {
+	if err != nil {
 		return err
-    }
+	}
 	i.addIndirect, err = decodeMgc(b, m)
-    if err != nil {
+	if err != nil {
 		return err
-    }
+	}
 	i.multImmediate, err = decodeMgc(b, m)
-    if err != nil {
+	if err != nil {
 		return err
-    }
+	}
 	i.multIndirect, err = decodeMgc(b, m)
 	return err
 }
