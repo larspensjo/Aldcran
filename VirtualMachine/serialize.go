@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/larspensjo/go-monotonic-graycode"
+	"log"
 )
 
 func (p *program) MarshalBinary() (data []byte, err error) {
@@ -46,18 +47,21 @@ func (p *program) UnmarshalBinary(data []byte) error {
 
 // Take a binary number, convert it to mgc, and encode it into a 4-byte array
 func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
-	converted := m.GetMgc(number)
-	binary.Write(b, binary.LittleEndian, converted)
+	converted := int16(m.GetMgc(number))
+	err := binary.Write(b, binary.LittleEndian, converted)
+	if err != nil {
+		log.Fatalln("encodeMgc failed", err)
+	}
 }
 
 // Given a byte string, convert to binary number
 func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) (int32, error) {
-	var mgcNumber mgc.MgcNumber
-	err := binary.Read(b, binary.LittleEndian, &mgcNumber)
+	var number int16
+	err := binary.Read(b, binary.LittleEndian, &number)
 	if err != nil {
 		return 0, err
 	}
-	return m.GetInt(mgcNumber), nil
+	return m.GetInt(mgc.MgcNumber(number)), nil
 }
 
 func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
