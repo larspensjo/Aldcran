@@ -36,6 +36,6 @@ func New(memorySize uint32) *program {
 	}
 	var p program
 	p.grayCode = mgcPointer
-	p.memory = make([]int32, memorySize)
+	p.memory = make([]int, memorySize)
 	return &p
 }

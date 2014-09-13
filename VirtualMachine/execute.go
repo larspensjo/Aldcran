@@ -27,17 +27,24 @@ func (p *program) run() {
 	}
 }
 
-func (i *instruction) execute(memory []int32) {
-	var value int32
+func (i *instruction) execute(memory []int) {
+	var value int
 	if i.clear > ParClearThreshold {
 		value = 0
 	}
 	value *= i.multImmediate
-	if ind := i.multIndirect; ind != 0 {
-		value *= ind
+	if ind := i.multIndirect; ind != 0 && int(ind) < len(memory) {
+		value *= memory[ind]
 	}
 	value += i.addImmediate
-	if ind := i.addIndirect; ind != 0 {
+	if ind := i.addIndirect; ind != 0 && int(ind) < len(memory) {
 		value += memory[ind]
+	}
+	if addr := i.storeAddress; addr != 0 && int(addr) < len(memory) {
+		memory[addr] = value
+	}
+	if ind := i.storeIndirect; ind != 0 && int(ind) < len(memory) && int(memory[ind]) < len(memory) {
+		addr := memory[ind]
+		memory[addr] = value
 	}
 }

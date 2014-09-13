@@ -42,7 +42,7 @@ func (p *program) UnmarshalBinary(data []byte) {
 }
 
 // Take a binary number, convert it to mgc, and encode it into a 4-byte array
-func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
+func encodeMgc(number int, b *bytes.Buffer, m *mgc.Mgc) {
 	// Convert the signed number to an unsigned that can be used for MGC.
 	var unsigned uint32 = uint32(number)
 	if number < 0 {
@@ -56,7 +56,7 @@ func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
 }
 
 // Given a byte string, convert to binary number
-func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) int32 {
+func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) int {
 	var number uint16
 	err := binary.Read(b, binary.LittleEndian, &number)
 	if err != nil {
@@ -64,9 +64,9 @@ func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) int32 {
 	}
 	var tmp uint32 = m.GetInt(mgc.MgcNumber(number))
 	// MGC only handles unsigned, convert to signed int
-	ret := int32(tmp)
+	ret := int(tmp)
 	if tmp > 0x3FFF {
-		ret = int32(tmp - 0x10000)
+		ret = int(tmp - 0x10000)
 	}
 	return ret
 }

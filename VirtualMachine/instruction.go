@@ -28,19 +28,19 @@ import (
 )
 
 type instruction struct {
-	clear         int32 // Clear operand if > ParClearThreshold
-	addImmediate  int32
-	addIndirect   int32
-	multImmediate int32
-	multIndirect  int32
-	storeAddress  int32
-	storeIndirect int32
+	clear         int // Clear operand if > ParClearThreshold
+	addImmediate  int
+	addIndirect   int
+	multImmediate int
+	multIndirect  int
+	storeAddress  int
+	storeIndirect int
 }
 
 type program struct {
 	instructions []instruction
 	grayCode     *mgc.Mgc
-	memory       []int32
+	memory       []int
 }
 
 type subroutine struct {
