@@ -32,22 +32,23 @@ func (p *program) MarshalBinary() (data []byte, err error) {
 	return buf.Bytes(), nil
 }
 
-func (p *program) UnmarshalBinary(data []byte) error {
+func (p *program) UnmarshalBinary(data []byte) {
 	b := bytes.NewBuffer(data)
 	for b.Len() > 0 {
 		var i instruction
-		err := i.decode(b, p.grayCode)
-		if err != nil {
-			return err
-		}
+		i.decode(b, p.grayCode)
 		p.instructions = append(p.instructions, i)
 	}
-	return nil
 }
 
 // Take a binary number, convert it to mgc, and encode it into a 4-byte array
 func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
-	converted := int16(m.GetMgc(number))
+	// Convert the signed number to an unsigned that can be used for MGC.
+	var unsigned uint32 = uint32(number)
+	if number < 0 {
+		unsigned = uint32(0x10000 - number)
+	}
+	converted := uint16(m.GetMgc(unsigned))
 	err := binary.Write(b, binary.LittleEndian, converted)
 	if err != nil {
 		log.Fatalln("encodeMgc failed", err)
@@ -55,13 +56,19 @@ func encodeMgc(number int32, b *bytes.Buffer, m *mgc.Mgc) {
 }
 
 // Given a byte string, convert to binary number
-func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) (int32, error) {
-	var number int16
+func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) int32 {
+	var number uint16
 	err := binary.Read(b, binary.LittleEndian, &number)
 	if err != nil {
-		return 0, err
+		log.Fatal("failed to read number from stream")
 	}
-	return m.GetInt(mgc.MgcNumber(number)), nil
+	var tmp uint32 = m.GetInt(mgc.MgcNumber(number))
+	// MGC only handles unsigned, convert to signed int
+	ret := int32(tmp)
+	if tmp > 0x3FFF {
+		ret = int32(tmp - 0x10000)
+	}
+	return ret
 }
 
 func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
@@ -74,34 +81,12 @@ func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
 	encodeMgc(i.storeIndirect, b, m)
 }
 
-func (i *instruction) decode(b *bytes.Buffer, m *mgc.Mgc) error {
-	var err error
-	// This has to be done in the opposite order to encode()
-
-	i.storeIndirect, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.storeAddress, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.multIndirect, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.multImmediate, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.addIndirect, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.addImmediate, err = decodeMgc(b, m)
-	if err != nil {
-		return err
-	}
-	i.clear, err = decodeMgc(b, m)
-	return err
+func (i *instruction) decode(b *bytes.Buffer, m *mgc.Mgc) {
+	i.clear = decodeMgc(b, m)
+	i.addImmediate = decodeMgc(b, m)
+	i.addIndirect = decodeMgc(b, m)
+	i.multImmediate = decodeMgc(b, m)
+	i.multIndirect = decodeMgc(b, m)
+	i.storeAddress = decodeMgc(b, m)
+	i.storeIndirect = decodeMgc(b, m)
 }
