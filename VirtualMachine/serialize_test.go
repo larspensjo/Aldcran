@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Aldcran.  If not, see <http://www.gnu.org/licenses/>.
 //
+
 package vm
 
 import (
@@ -24,7 +25,7 @@ import (
 func TestFindPathMixed(t *testing.T) {
 	var p program
 	p.grayCode = mgc.New(16)
-	var i instruction
+	i := instruction{clear: 0, addImmediate: 1, addIndirect: 2, multImmediate: 3, multIndirect: 5, storeAddress: 6, storeIndirect: 7}
 	p.instructions = append(p.instructions, i)
 	data, err := p.MarshalBinary()
 	if err != nil {

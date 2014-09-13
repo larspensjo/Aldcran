@@ -65,6 +65,8 @@ func decodeMgc(b *bytes.Buffer, m *mgc.Mgc) (int32, error) {
 }
 
 func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
+	encodeMgc(i.storeAddress, b, m)
+	encodeMgc(i.storeIndirect, b, m)
 	encodeMgc(i.clear, b, m)
 	encodeMgc(i.addImmediate, b, m)
 	encodeMgc(i.addIndirect, b, m)
@@ -75,6 +77,15 @@ func (i *instruction) encode(b *bytes.Buffer, m *mgc.Mgc) {
 func (i *instruction) decode(b *bytes.Buffer, m *mgc.Mgc) error {
 	var err error
 	// This has to be done in the opposite order to encode()
+
+	i.multIndirect, err = decodeMgc(b, m)
+	if err != nil {
+		return err
+	}
+	i.multImmediate, err = decodeMgc(b, m)
+	if err != nil {
+		return err
+	}
 	i.clear, err = decodeMgc(b, m)
 	if err != nil {
 		return err

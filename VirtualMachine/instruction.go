@@ -15,6 +15,11 @@
 // along with Aldcran.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+// Implement a virtual machine used by Aldcran.
+// The propeties of this is:
+// 1. Use a very wide instruction set
+// 2. Only one instruction, which means no opcode is needed
+// 3. A program shall be resilient to bit mutations. It shall change the behaviour, but have low risk of breaking the program completely
 package vm
 
 import (
@@ -32,6 +37,8 @@ type instruction struct {
 	addIndirect   int32
 	multImmediate int32
 	multIndirect  int32
+	storeAddress  int32
+	storeIndirect int32
 }
 
 type program struct {
