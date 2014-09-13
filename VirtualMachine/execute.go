@@ -17,18 +17,27 @@
 
 package vm
 
-import (
-	"github.com/larspensjo/go-monotonic-graycode"
-	"testing"
+const (
+	ParClearThreshold = 100
 )
 
-func TestSerialization(t *testing.T) {
-	var p program
-	p.grayCode = mgc.New(16)
-	i := instruction{clear: 0, addImmediate: 1, addIndirect: 2, multImmediate: 3, multIndirect: 5, storeAddress: 6, storeIndirect: 7}
-	p.instructions = append(p.instructions, i)
-	data, err := p.MarshalBinary()
-	if err != nil {
-		t.Error("Failed to Marshal", data)
+func (p *program) run() {
+	for pc := 0; pc < len(p.instructions); pc++ {
+		p.instructions[pc].execute(p.memory)
+	}
+}
+
+func (i *instruction) execute(memory []int32) {
+	var value int32
+	if i.clear > ParClearThreshold {
+		value = 0
+	}
+	value *= i.multImmediate
+	if ind := i.multIndirect; ind != 0 {
+		value *= ind
+	}
+	value += i.addImmediate
+	if ind := i.addIndirect; ind != 0 {
+		value += memory[ind]
 	}
 }

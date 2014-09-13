@@ -19,10 +19,23 @@ package vm
 
 import (
 	"github.com/larspensjo/go-monotonic-graycode"
+	"log"
 )
 
 var mgcPointer *mgc.Mgc
 
 func Init(width uint32) {
 	mgcPointer = mgc.New(width)
+}
+
+// Create a program data structure
+// Instructions have to be added afterwards
+func New(memorySize uint32) *program {
+	if mgcPointer == nil {
+		log.Fatal("Must call Init() first")
+	}
+	var p program
+	p.grayCode = mgcPointer
+	p.memory = make([]int32, memorySize)
+	return &p
 }

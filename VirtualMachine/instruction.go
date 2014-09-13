@@ -27,10 +27,6 @@ import (
 	"github.com/larspensjo/go-monotonic-graycode"
 )
 
-const (
-	ParClearThreshold = 100
-)
-
 type instruction struct {
 	clear         int32 // Clear operand if > ParClearThreshold
 	addImmediate  int32
@@ -44,6 +40,7 @@ type instruction struct {
 type program struct {
 	instructions []instruction
 	grayCode     *mgc.Mgc
+	memory       []int32
 }
 
 type subroutine struct {
