@@ -33,7 +33,7 @@ func (p *program) run() {
 }
 
 func (i *instruction) execute(p *program) {
-	memory := p.memory
+	memory := p.virtualMachine.memory
 	var value int
 	if i.clear > parClearThreshold {
 		value = 0

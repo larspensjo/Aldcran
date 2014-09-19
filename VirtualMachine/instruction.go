@@ -24,7 +24,6 @@ package vm
 
 import (
 	"fmt"
-	"github.com/larspensjo/go-monotonic-graycode"
 )
 
 type instruction struct {
@@ -49,11 +48,10 @@ var noop = instruction{
 
 type program struct {
 	instructions []instruction
-	grayCode     *mgc.Mgc
-	memory       []int
 	// The sum of all penalties during execution.
 	// This will be used to evaluate the success/failure indicator of the algorithm
-	penalties int
+	penalties      int
+	virtualMachine *VirtualMachine
 }
 
 type subroutine struct {

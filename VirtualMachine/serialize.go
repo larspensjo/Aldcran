@@ -27,7 +27,7 @@ import (
 func (p *program) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	for _, ins := range p.instructions {
-		ins.encode(buf, p.grayCode)
+		ins.encode(buf, p.virtualMachine.graycode)
 	}
 	return buf.Bytes(), nil
 }
@@ -36,7 +36,7 @@ func (p *program) UnmarshalBinary(data []byte) {
 	b := bytes.NewBuffer(data)
 	for b.Len() > 0 {
 		var i instruction
-		i.decode(b, p.grayCode)
+		i.decode(b, p.virtualMachine.graycode)
 		p.instructions = append(p.instructions, i)
 	}
 }

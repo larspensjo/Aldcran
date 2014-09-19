@@ -23,16 +23,16 @@ import (
 )
 
 func TestSerialization(t *testing.T) {
-	var p program
-	p.grayCode = mgc.New(16)
+	var vm VirtualMachine
+	vm.graycode = mgc.New(16)
+	p := program{virtualMachine: &vm}
 	i := instruction{clear: 1, addImmediate: 2, addIndirect: 3, multImmediate: 4, multIndirect: 5, storeAddress: 6, storeIndirect: 7}
 	p.instructions = append(p.instructions, i)
 	data, err := p.MarshalBinary()
 	if err != nil {
 		t.Error("Failed to Marshal", data)
 	}
-	var p2 program
-	p2.grayCode = p.grayCode
+	p2 := program{virtualMachine: &vm}
 	p2.UnmarshalBinary(data)
 	if len(p2.instructions) != 1 {
 		t.Error("Expected one instruction")

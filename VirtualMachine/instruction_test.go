@@ -23,6 +23,7 @@ import (
 
 func TestNoop(t *testing.T) {
 	var p program
+	p.virtualMachine = new(VirtualMachine)
 	p.run() // Running without memory or any instructions
 	if p.penalties != 0 {
 		t.Error("Expected no errors from empty program")
@@ -36,18 +37,19 @@ func TestNoop(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	var p program
+	p.virtualMachine = new(VirtualMachine)
 	p.instructions = []instruction{{addImmediate: 1, storeAddress: 1}}
 	p.run() // Running with no memory installed
 	if p.penalties == 0 {
 		t.Error("Should be memory error")
 	}
 	p.penalties = 0
-	p.memory = make([]int, 2)
+	p.virtualMachine.memory = make([]int, 2)
 	p.run()
 	if p.penalties > 0 {
 		t.Error("Shouldn't be error from addimmediate")
 	}
-	if p.memory[1] != 1 {
-		t.Error("addimmediate should give 1, but had", p.memory[1])
+	if p.virtualMachine.memory[1] != 1 {
+		t.Error("addimmediate should give 1, but had", p.virtualMachine.memory[1])
 	}
 }

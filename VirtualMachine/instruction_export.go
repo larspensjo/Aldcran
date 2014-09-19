@@ -19,23 +19,24 @@ package vm
 
 import (
 	"github.com/larspensjo/go-monotonic-graycode"
-	"log"
 )
 
-var mgcPointer *mgc.Mgc
+type VirtualMachine struct {
+	graycode *mgc.Mgc
+	memory   []int
+}
 
-func Init(width uint32) {
-	mgcPointer = mgc.New(width)
+func New(width uint32, memorySize uint32) *VirtualMachine {
+	var vm VirtualMachine
+	vm.graycode = mgc.New(width)
+	vm.memory = make([]int, memorySize)
+	return &vm
 }
 
 // Create a program data structure
 // Instructions have to be added afterwards
-func New(memorySize uint32) *program {
-	if mgcPointer == nil {
-		log.Fatal("Must call Init() first")
-	}
+func (vm *VirtualMachine) NewProgram() *program {
 	var p program
-	p.grayCode = mgcPointer
-	p.memory = make([]int, memorySize)
+	p.virtualMachine = vm
 	return &p
 }

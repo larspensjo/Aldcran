@@ -20,10 +20,12 @@ package main
 import (
 	"Aldcran/MergePrograms"
 	"Aldcran/VirtualMachine"
-	// "fmt"
+	"fmt"
 )
 
+var virtualMachine = vm.New(16, 10)
+
 func main() {
-	vm.Init(16)
 	merge.Test()
+	fmt.Println(virtualMachine)
 }
