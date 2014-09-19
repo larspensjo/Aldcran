@@ -37,6 +37,16 @@ type instruction struct {
 	storeIndirect int
 }
 
+var noop = instruction{
+	clear:         0,
+	addImmediate:  0,
+	addIndirect:   0,
+	multImmediate: 1,
+	multIndirect:  0,
+	storeAddress:  0,
+	storeIndirect: 0,
+}
+
 type program struct {
 	instructions []instruction
 	grayCode     *mgc.Mgc
@@ -47,7 +57,7 @@ type program struct {
 }
 
 type subroutine struct {
-	id int32 // Identifying the subroutine
+	id uint32 // Identifying the subroutine
 	pr program
 }
 
