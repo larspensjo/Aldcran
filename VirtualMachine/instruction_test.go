@@ -38,7 +38,7 @@ func TestNoop(t *testing.T) {
 func TestAdd(t *testing.T) {
 	var p program
 	p.virtualMachine = new(VirtualMachine)
-	p.instructions = []instruction{{addImmediate: 1, storeAddress: 1}}
+	p.instructions = []instruction{{multImmediate: 1, addImmediate: 1, storeAddress: 1}}
 	p.run() // Running with no memory installed
 	if p.penalties == 0 {
 		t.Error("Should be memory error")

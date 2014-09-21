@@ -18,6 +18,7 @@
 package vm
 
 import (
+	"fmt"
 	"github.com/larspensjo/go-monotonic-graycode"
 )
 
@@ -39,4 +40,41 @@ func (vm *VirtualMachine) NewProgram() *program {
 	var p program
 	p.virtualMachine = vm
 	return &p
+}
+
+// Convert an instruction to a pretty string
+func (i *instruction) String() (ret string) {
+	if i.clear > parClearThreshold {
+		ret = "Clear, "
+	}
+	if i.multImmediate != 1 {
+		ret += fmt.Sprintf("*%d, ", i.multImmediate)
+	}
+	if ind := i.multIndirect; ind != 0 {
+		ret += fmt.Sprintf("*mem[%d], ", i.multImmediate)
+	}
+	if i.addImmediate != 0 {
+		ret += fmt.Sprintf("+%d, ", i.addImmediate)
+	}
+	if ind := i.addIndirect; ind != 0 {
+		ret += fmt.Sprintf("+mem[%d], ", i.multImmediate)
+	}
+	if addr := i.storeAddress; addr != 0 {
+		ret += fmt.Sprintf("store[%d], ", i.storeAddress)
+	}
+	if ind := i.storeIndirect; ind != 0 {
+		ret += fmt.Sprintf("store[*%d], ", i.storeAddress)
+	}
+
+	if ret == "" {
+		ret = "noop"
+	}
+	return
+}
+
+func (p *program) String() (ret string) {
+	for i, ins := range p.instructions {
+		ret += fmt.Sprintln(i, ": ", ins.String())
+	}
+	return
 }
