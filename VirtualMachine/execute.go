@@ -20,6 +20,7 @@ package vm
 // These are parameters that can be tuned for better efficiency
 const (
 	parClearThreshold                  = 100
+	parMultScaling                     = 100
 	parPenaltyMultIllegalAddress       = 100
 	parPenaltyAddIllegalAddress        = 100
 	parPenaltyStoreIllegalAddress      = 100
@@ -38,10 +39,12 @@ func (i *instruction) execute(p *program) {
 	if i.clear > parClearThreshold {
 		value = 0
 	}
-	value *= i.multImmediate
+	// Convert to float while doing computation. Don't multiply with the exact argument,
+	// use a down scaled value added with 1 to minimize impact
+	value = int(float64(value) * (1 + float64(i.multImmediate) / parMultScaling) + 0.5)
 	if ind := i.multIndirect; ind != 0 {
 		if int(ind) < len(memory) {
-			value *= memory[ind]
+			value = int(float64(value) * (1 + float64(memory[ind]) / parMultScaling) + 0.5)
 		} else {
 			p.addPenalty(parPenaltyMultIllegalAddress)
 		}

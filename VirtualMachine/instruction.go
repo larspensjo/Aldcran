@@ -40,7 +40,7 @@ var noop = instruction{
 	clear:         0,
 	addImmediate:  0,
 	addIndirect:   0,
-	multImmediate: 1,
+	multImmediate: 0,
 	multIndirect:  0,
 	storeAddress:  0,
 	storeIndirect: 0,
