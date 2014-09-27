@@ -27,10 +27,13 @@ const (
 	parPenaltyStoreIndirIllegalAddress = 100
 )
 
-func (p *program) run() {
+// Run a program, and return the number of instructions that were executed
+func (p *program) run() (cost int) {
 	for pc := 0; pc < len(p.instructions); pc++ {
+		cost++
 		p.instructions[pc].execute(p)
 	}
+	return
 }
 
 func (i *instruction) execute(p *program) {
@@ -41,10 +44,10 @@ func (i *instruction) execute(p *program) {
 	}
 	// Convert to float while doing computation. Don't multiply with the exact argument,
 	// use a down scaled value added with 1 to minimize impact
-	value = int(float64(value) * (1 + float64(i.multImmediate) / parMultScaling) + 0.5)
+	value = int(float64(value)*(1+float64(i.multImmediate)/parMultScaling) + 0.5)
 	if ind := i.multIndirect; ind != 0 {
 		if int(ind) < len(memory) {
-			value = int(float64(value) * (1 + float64(memory[ind]) / parMultScaling) + 0.5)
+			value = int(float64(value)*(1+float64(memory[ind])/parMultScaling) + 0.5)
 		} else {
 			p.addPenalty(parPenaltyMultIllegalAddress)
 		}
