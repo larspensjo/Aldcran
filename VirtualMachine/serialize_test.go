@@ -18,21 +18,18 @@
 package vm
 
 import (
-	"github.com/larspensjo/go-monotonic-graycode"
 	"testing"
 )
 
 func TestSerialization(t *testing.T) {
-	var vm VirtualMachine
-	vm.graycode = mgc.New(16)
-	p := program{virtualMachine: &vm}
+	p := program{virtualMachine: vmTest}
 	i := instruction{clear: 1, addImmediate: 2, addIndirect: 3, multImmediate: 4, multIndirect: 5, storeAddress: 6, storeIndirect: 7}
 	p.instructions = append(p.instructions, i)
 	data, err := p.MarshalBinary()
 	if err != nil {
 		t.Error("Failed to Marshal", data)
 	}
-	p2 := program{virtualMachine: &vm}
+	p2 := program{virtualMachine: vmTest}
 	p2.UnmarshalBinary(data)
 	if len(p2.instructions) != 1 {
 		t.Error("Expected one instruction")
@@ -40,5 +37,4 @@ func TestSerialization(t *testing.T) {
 	if p2.instructions[0] != i {
 		t.Error("Failed to serialize/deserialize:", i, p2.instructions[0])
 	}
-
 }

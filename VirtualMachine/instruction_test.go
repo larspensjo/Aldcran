@@ -21,6 +21,9 @@ import (
 	"testing"
 )
 
+// Create a virtual machine used in most tests
+var vmTest = New(16, 1000)
+
 func TestNoop(t *testing.T) {
 	var p program
 	p.virtualMachine = new(VirtualMachine)

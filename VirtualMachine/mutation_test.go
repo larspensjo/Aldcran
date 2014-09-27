@@ -18,22 +18,21 @@
 package vm
 
 import (
-	"github.com/larspensjo/go-monotonic-graycode"
 	"log"
 	"testing"
 )
 
 func TestMutation(t *testing.T) {
-	var vm VirtualMachine
-	vm.graycode = mgc.New(16)
-	p := program{virtualMachine: &vm}
-	for i := 0; i < 10; i++ {
+	p := program{virtualMachine: vmTest}
+	for i := 0; i < 20; i++ {
 		p.instructions = append(p.instructions, noop)
 	}
-	log.Print(p.String())
-	_, err := p.MarshalBinary()
+	bin, err := p.MarshalBinary()
 	if err != nil {
 		t.Error("MarshalBinary returned ", err)
 	}
-	// mutate(bin, 0.1)
+	mutate(bin, 0.03)
+	p2 := program{virtualMachine: vmTest}
+	p2.UnmarshalBinary(bin)
+	log.Print(p2.String())
 }
