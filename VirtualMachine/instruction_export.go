@@ -51,19 +51,19 @@ func (i *instruction) String() (ret string) {
 		ret += fmt.Sprintf("*%d, ", i.multImmediate)
 	}
 	if ind := i.multIndirect; ind != 0 {
-		ret += fmt.Sprintf("*mem[%d], ", i.multImmediate)
+		ret += fmt.Sprintf("*mem[%d], ", ind)
 	}
 	if i.addImmediate != 0 {
 		ret += fmt.Sprintf("+%d, ", i.addImmediate)
 	}
 	if ind := i.addIndirect; ind != 0 {
-		ret += fmt.Sprintf("+mem[%d], ", i.multImmediate)
+		ret += fmt.Sprintf("+mem[%d], ", ind)
 	}
 	if addr := i.storeAddress; addr != 0 {
-		ret += fmt.Sprintf("store[%d], ", i.storeAddress)
+		ret += fmt.Sprintf("store[%d], ", addr)
 	}
 	if ind := i.storeIndirect; ind != 0 {
-		ret += fmt.Sprintf("store[*%d], ", i.storeAddress)
+		ret += fmt.Sprintf("store[*%d], ", ind)
 	}
 
 	if ret == "" {
