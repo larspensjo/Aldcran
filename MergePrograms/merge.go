@@ -23,8 +23,7 @@ import (
 	"math/rand"
 )
 
-type instruction int
-type program []instruction
+type program []byte
 type edit_graph [][]bool
 
 func findMatchPoints(x program, y program) edit_graph {

@@ -81,7 +81,7 @@ func TestFindPathDifferent(t *testing.T) {
 	var graph edit_graph
 
 	x = program{1}
-	y = program{999}
+	y = program{99}
 	graph = findMatchPoints(x, y)
 	cost, p := findShortestPathButeForce(graph, 0, 0)
 	expCost := len(x) + len(y)
