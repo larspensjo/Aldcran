@@ -47,7 +47,7 @@ func (i *instruction) String() (ret string) {
 	if i.clear > parClearThreshold {
 		ret = "Clear, "
 	}
-	if i.multImmediate != 1 {
+	if i.multImmediate != 0 {
 		ret += fmt.Sprintf("*%d, ", i.multImmediate)
 	}
 	if ind := i.multIndirect; ind != 0 {
