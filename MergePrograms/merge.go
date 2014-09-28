@@ -56,6 +56,10 @@ const (
 // Step 0: (diag): Add second character from x or y (0).
 type path []step
 
+func (gr edit_graph) findShortestPath() (cost int, p path) {
+	return findShortestPathBruteForce(gr, 0, 0)
+}
+
 // Simple algorithm, but not optimal
 func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
 	if y == len(gr) {
@@ -138,7 +142,7 @@ func Test() {
 	y := program{0, 1, 6, 3}
 	fmt.Println("Program 2:", y)
 	graph := findMatchPoints(y, x)
-	cost, p := findShortestPathBruteForce(graph, 0, 0)
+	cost, p := graph.findShortestPath()
 	fmt.Println("Testing, cost", cost, "path", p)
 	for i := 0; i < 20; i++ {
 		newProg := p.randomMerge(x, y)

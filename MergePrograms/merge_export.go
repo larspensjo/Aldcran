@@ -21,7 +21,7 @@ package merge
 // Do a random merge transform on two programs, and return the new program
 func RandomMerge(p1, p2 []byte) []byte {
 	graph := findMatchPoints(p1, p2)
-	_, p := findShortestPathBruteForce(graph, 0, 0)
+	_, p := graph.findShortestPath()
 	newProg := p.randomMerge(p1, p2)
 	return newProg
 }
