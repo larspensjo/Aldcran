@@ -20,6 +20,8 @@ package merge
 
 import (
 	"fmt"
+	"log"
+	"math"
 	"math/rand"
 )
 
@@ -57,12 +59,28 @@ const (
 type path []step
 
 func (gr edit_graph) findShortestPath() (cost int, p path) {
-	return findShortestPathBruteForce(gr, 0, 0)
+	for maxCost := 0; ; maxCost++ {
+		cost, p, abort := findShortestPathBruteForce(gr, 0, 0, maxCost)
+		if !abort {
+			if cost != maxCost {
+				log.Fatal("Expect costs to be the same (", cost, " and ", maxCost, ")")
+			}
+			return cost, p
+		}
+	}
+	return
 }
 
-// Simple algorithm, but not optimal
-func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
+func findShortestPathBruteForce(gr edit_graph, x, y, maxCost int) (cost int, p path, abort bool) {
+	if maxCost < 0 {
+		// Cancel this attempt. 0 cost could still work, though.
+		return 0, nil, true
+	}
 	if y == len(gr) {
+		if len(gr[0])-x > maxCost {
+			abort = true
+			return
+		}
 		for ; x < len(gr[0]); x++ {
 			cost++
 			p = append(p, right)
@@ -70,27 +88,45 @@ func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
 		return
 	}
 	if x == len(gr[0]) {
+		if len(gr)-y > maxCost {
+			abort = true
+			return
+		}
 		for ; y < len(gr); y++ {
 			cost++
 			p = append(p, down)
 		}
 		return
 	}
-	bestCost, bestPath := findShortestPathBruteForce(gr, x+1, y)
+	bestCost := math.MaxUint32
+	bestPath := path{}
 	bestDir := right
-	testCost, testPath := findShortestPathBruteForce(gr, x, y+1)
-	if testCost < bestCost {
+	abort = true
+	testCost, testPath, testAbort := findShortestPathBruteForce(gr, x+1, y, maxCost-1)
+	if !testAbort {
+		bestCost = testCost
+		bestPath = testPath
+		abort = false
+	}
+	testCost, testPath, testAbort = findShortestPathBruteForce(gr, x, y+1, maxCost-1)
+	if !testAbort && testCost < bestCost {
 		bestCost = testCost
 		bestPath = testPath
 		bestDir = down
+		abort = false
 	}
 	if gr[y][x] {
-		testCost, testPath = findShortestPathBruteForce(gr, x+1, y+1)
-		if testCost-1 < bestCost {
+		testCost, testPath, testAbort = findShortestPathBruteForce(gr, x+1, y+1, maxCost)
+		if !testAbort && testCost-1 < bestCost {
 			bestCost = testCost - 1
 			bestPath = testPath
 			bestDir = diag
+			abort = false
 		}
+	}
+	if abort {
+		// Nothing found
+		return 0, nil, true
 	}
 	cost = bestCost + 1
 	p = append(path{bestDir}, bestPath...)
