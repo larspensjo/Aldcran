@@ -24,6 +24,7 @@ import (
 )
 
 type program []byte
+
 type edit_graph [][]bool
 
 func findMatchPoints(x program, y program) edit_graph {
@@ -50,7 +51,7 @@ const (
 type path []step
 
 // Simple algorithm, but not optimal
-func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
+func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
 	if y == len(gr) {
 		p = path{}
 		for ; x < len(gr[0]); x++ {
@@ -68,13 +69,13 @@ func findShortestPathButeForce(gr edit_graph, x, y int) (cost int, p path) {
 		return
 	}
 	if gr[y][x] {
-		addCost, rest := findShortestPathButeForce(gr, x+1, y+1)
+		addCost, rest := findShortestPathBruteForce(gr, x+1, y+1)
 		cost += addCost
 		p = append(path{diag}, rest...)
 		return
 	}
-	addCost1, rest1 := findShortestPathButeForce(gr, x+1, y)
-	addCost2, rest2 := findShortestPathButeForce(gr, x, y+1)
+	addCost1, rest1 := findShortestPathBruteForce(gr, x+1, y)
+	addCost2, rest2 := findShortestPathBruteForce(gr, x, y+1)
 	if addCost1 < addCost2 {
 		cost = addCost1 + 1
 		p = append(path{right}, rest1...)
@@ -130,7 +131,7 @@ func Test() {
 	y := program{0, 1, 6, 3}
 	fmt.Println("Program 2:", y)
 	graph := findMatchPoints(y, x)
-	cost, p := findShortestPathButeForce(graph, 0, 0)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
 	fmt.Println("Testing, cost", cost, "path", p)
 	for i := 0; i < 20; i++ {
 		newProg := p.randomMerge(x, y)
