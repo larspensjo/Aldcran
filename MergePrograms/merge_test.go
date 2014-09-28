@@ -187,3 +187,45 @@ func TestMerge(t *testing.T) {
 		t.Log("Child prog", newProg, "cost", newCost2)
 	}
 }
+
+func TestDiffLong(t *testing.T) {
+	// x := program{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0}
+	// y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	x := program{0, 1, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0}
+	y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	graph := findMatchPoints(x, y)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
+	t.Log("Cost", cost, "Path", p)
+}
+
+func TestMergeLong(t *testing.T) {
+	// This is a use case that failed at one point
+	// x := program{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	x := program{1, 0}
+	// y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	y := program{0, 0}
+	numDiffs := 0
+	if len(x) != len(y) {
+		t.Fatal("This test depends on strings being of equal length")
+	}
+	for i := range x {
+		if x[i] != y[i] {
+			numDiffs++
+		}
+	}
+	graph := findMatchPoints(y, x)
+	t.Log("Graph:", graph)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
+	t.Log("Path:", p)
+	if cost != numDiffs*2 {
+		t.Error("Cost was", cost, "but expected cost was", numDiffs*2)
+	}
+	t.Log("Cost between parents", cost)
+	newProg := p.randomMerge(x, y)
+	if len(newProg) != len(x) {
+		t.Error("New prog had length", len(newProg), "while expected", len(x))
+	}
+	t.Log(x)
+	t.Log(y)
+	t.Log(newProg)
+}

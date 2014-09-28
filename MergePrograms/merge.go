@@ -59,7 +59,6 @@ type path []step
 // Simple algorithm, but not optimal
 func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
 	if y == len(gr) {
-		p = path{}
 		for ; x < len(gr[0]); x++ {
 			cost++
 			p = append(p, right)
@@ -67,28 +66,30 @@ func findShortestPathBruteForce(gr edit_graph, x, y int) (cost int, p path) {
 		return
 	}
 	if x == len(gr[0]) {
-		p = path{}
 		for ; y < len(gr); y++ {
 			cost++
 			p = append(p, down)
 		}
 		return
 	}
+	bestCost, bestPath := findShortestPathBruteForce(gr, x+1, y)
+	bestDir := right
+	testCost, testPath := findShortestPathBruteForce(gr, x, y+1)
+	if testCost < bestCost {
+		bestCost = testCost
+		bestPath = testPath
+		bestDir = down
+	}
 	if gr[y][x] {
-		addCost, rest := findShortestPathBruteForce(gr, x+1, y+1)
-		cost += addCost
-		p = append(path{diag}, rest...)
-		return
+		testCost, testPath = findShortestPathBruteForce(gr, x+1, y+1)
+		if testCost-1 < bestCost {
+			bestCost = testCost - 1
+			bestPath = testPath
+			bestDir = diag
+		}
 	}
-	addCost1, rest1 := findShortestPathBruteForce(gr, x+1, y)
-	addCost2, rest2 := findShortestPathBruteForce(gr, x, y+1)
-	if addCost1 < addCost2 {
-		cost = addCost1 + 1
-		p = append(path{right}, rest1...)
-	} else {
-		cost = addCost2 + 1
-		p = append(path{down}, rest2...)
-	}
+	cost = bestCost + 1
+	p = append(path{bestDir}, bestPath...)
 	return
 }
 
