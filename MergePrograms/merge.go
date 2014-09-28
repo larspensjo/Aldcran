@@ -43,11 +43,17 @@ func findMatchPoints(x program, y program) edit_graph {
 type step int
 
 const (
-	right step = iota
-	down
-	diag
+	diag  step = iota // No change needed, both values are the same
+	right             // Skip x-value from the string at current position
+	down              // Add the y-value to the string at current position
 )
 
+// A path defines the changes (steps) needed to transform one string into another.
+// Example, given the two strings x="00" and y="10". The path will now become "210" (steps).
+// This will transform from x to y as follows:
+// Step 2 (down): Add first character from y (1).
+// Step 1 (right): Skip first character from x (0).
+// Step 0: (diag): Add second character from x or y (0).
 type path []step
 
 // Simple algorithm, but not optimal
