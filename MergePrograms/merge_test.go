@@ -53,7 +53,7 @@ func TestFindPathEqual(t *testing.T) {
 	x := program{1}
 	y := x
 	graph := findMatchPoints(x, y)
-	cost, p := findShortestPathButeForce(graph, 0, 0)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
@@ -61,7 +61,7 @@ func TestFindPathEqual(t *testing.T) {
 	x = program{1, 2}
 	y = x
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
@@ -69,7 +69,7 @@ func TestFindPathEqual(t *testing.T) {
 	x = program{1, 2, 3, 4, 5}
 	y = x
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
@@ -83,7 +83,7 @@ func TestFindPathDifferent(t *testing.T) {
 	x = program{1}
 	y = program{99}
 	graph = findMatchPoints(x, y)
-	cost, p := findShortestPathButeForce(graph, 0, 0)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
 	expCost := len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -91,7 +91,7 @@ func TestFindPathDifferent(t *testing.T) {
 
 	x = program{1, 2}
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -99,7 +99,7 @@ func TestFindPathDifferent(t *testing.T) {
 
 	// Same as previous, but toggle arguments
 	graph = findMatchPoints(y, x)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -107,7 +107,7 @@ func TestFindPathDifferent(t *testing.T) {
 
 	x = program{1, 2, 3, 4, 5}
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -121,7 +121,7 @@ func TestFindPathMixed(t *testing.T) {
 	x = program{1, 2}
 	y = program{1, 3}
 	graph = findMatchPoints(x, y)
-	cost, p := findShortestPathButeForce(graph, 0, 0)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
 	expCost := 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -130,7 +130,7 @@ func TestFindPathMixed(t *testing.T) {
 	x = program{1, 3}
 	y = program{2, 3}
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -139,7 +139,7 @@ func TestFindPathMixed(t *testing.T) {
 	x = program{1, 2, 3}
 	y = program{1, 4, 5}
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = 4
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -148,7 +148,7 @@ func TestFindPathMixed(t *testing.T) {
 	x = program{1, 2, 3}
 	y = program{1, 4, 3}
 	graph = findMatchPoints(x, y)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -157,7 +157,7 @@ func TestFindPathMixed(t *testing.T) {
 	x = program{'a', 'b', 'c', 'a', 'b', 'b', 'a'}
 	y = program{'c', 'b', 'a', 'b', 'a', 'c'}
 	graph = findMatchPoints(y, x)
-	cost, p = findShortestPathButeForce(graph, 0, 0)
+	cost, p = findShortestPathBruteForce(graph, 0, 0)
 	expCost = 5
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -169,18 +169,18 @@ func TestMerge(t *testing.T) {
 	x := program{1, 2, 3, 4, 5, 6, 7, 8}
 	y := program{1, 9, 3, 0, 5, 0, 7, 0}
 	graph := findMatchPoints(y, x)
-	cost, p := findShortestPathButeForce(graph, 0, 0)
+	cost, p := findShortestPathBruteForce(graph, 0, 0)
 	t.Log("Cost between parents", cost)
 	for i := 0; i < 10; i++ {
 		newProg := p.randomMerge(x, y)
 		// Compare the child program to each of the parents. The difference to them should be
 		// less or same compared to the difference between the parents
 		graph := findMatchPoints(x, newProg)
-		newCost1, _ := findShortestPathButeForce(graph, 0, 0)
+		newCost1, _ := findShortestPathBruteForce(graph, 0, 0)
 		t.Log("Child prog", newProg, "cost", newCost1)
 
 		graph = findMatchPoints(y, newProg)
-		newCost2, _ := findShortestPathButeForce(graph, 0, 0)
+		newCost2, _ := findShortestPathBruteForce(graph, 0, 0)
 		if newCost1+newCost2 != cost {
 			t.Error("Invalid cost", newCost1, "+", newCost2, "!=", cost)
 		}
