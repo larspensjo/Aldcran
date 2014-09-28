@@ -58,6 +58,48 @@ const (
 // Step 0: (diag): Add second character from x or y (0).
 type path []step
 
+type node struct {
+	x, y int
+	next int // The node that follows on this node
+}
+
+func findShortestPath2(a, b program) (cost int) {
+	endNode := node{len(a), len(b), 0}
+	buffer := []node{endNode}
+	start := 0
+	end := 1
+	for iter := 0; ; iter++ {
+		for i := start; i < end; i++ {
+			n := buffer[i]
+			x := n.x - 1
+			y := n.y
+			for x < len(a) && y < len(b) && x >= 0 && y >= 0 && a[x] == b[y] {
+				x--
+				y--
+			}
+			if x <= 0 && y <= 0 {
+				return iter
+			}
+			// log.Println("Iter", iter, "adding", x, ",", y)
+			buffer = append(buffer, node{x, y, 0})
+
+			x = n.x
+			y = n.y - 1
+			for x < len(a) && y < len(b) && x >= 0 && y >= 0 && a[x] == b[y] {
+				x--
+				y--
+			}
+			if x <= 0 && y <= 0 {
+				return iter
+			}
+			// log.Println("Iter", iter, "adding", x, ",", y)
+			buffer = append(buffer, node{x, y, 0})
+		}
+		start = end
+		end = len(buffer)
+	}
+}
+
 func (gr edit_graph) findShortestPath() (cost int, p path) {
 	for maxCost := 0; ; maxCost++ {
 		cost, p, abort := findShortestPathBruteForce(gr, 0, 0, maxCost)
