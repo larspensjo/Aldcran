@@ -22,54 +22,24 @@ import (
 	"testing"
 )
 
-func compareEditGraphs(a, b edit_graph) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for y := range a {
-		if len(b[y]) != len(a[y]) {
-			return false
-		}
-		for x := range a[y] {
-			if a[y][x] != b[y][x] {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func TestEditGraph(t *testing.T) {
-	x := program{1, 2}
-	y := program{1, 2, 3}
-	graph := findMatchPoints(x, y)
-	expect := edit_graph{{true, false}, {false, true}, {false, false}}
-	if !compareEditGraphs(expect, graph) {
-		t.Error("Expected:", expect, "got", graph)
-	}
-}
-
 func TestFindPathEqual(t *testing.T) {
 	x := program{1}
 	y := x
-	graph := findMatchPoints(x, y)
-	cost, p := graph.findShortestPath()
+	cost, p := findShortestPath(x, y)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
 
 	x = program{1, 2}
 	y = x
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
 
 	x = program{1, 2, 3, 4, 5}
 	y = x
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	if cost != 0 || len(p) != len(x) {
 		t.Error("Expected cost 0, path length", len(x), "got cost", cost, "with path", p)
 	}
@@ -78,36 +48,31 @@ func TestFindPathEqual(t *testing.T) {
 // Tests where everything differs
 func TestFindPathDifferent(t *testing.T) {
 	var x, y program
-	var graph edit_graph
 
 	x = program{1}
 	y = program{99}
-	graph = findMatchPoints(x, y)
-	cost, p := graph.findShortestPath()
+	cost, p := findShortestPath(x, y)
 	expCost := len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
 	}
 
 	x = program{1, 2}
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
 	}
 
 	// Same as previous, but toggle arguments
-	graph = findMatchPoints(y, x)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
 	}
 
 	x = program{1, 2, 3, 4, 5}
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = len(x) + len(y)
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -116,12 +81,10 @@ func TestFindPathDifferent(t *testing.T) {
 
 func TestFindPathMixed(t *testing.T) {
 	var x, y program
-	var graph edit_graph
 
 	x = program{1, 2}
 	y = program{1, 3}
-	graph = findMatchPoints(x, y)
-	cost, p := graph.findShortestPath()
+	cost, p := findShortestPath(x, y)
 	expCost := 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -129,8 +92,7 @@ func TestFindPathMixed(t *testing.T) {
 
 	x = program{1, 3}
 	y = program{2, 3}
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -138,8 +100,7 @@ func TestFindPathMixed(t *testing.T) {
 
 	x = program{1, 2, 3}
 	y = program{1, 4, 5}
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = 4
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -147,8 +108,7 @@ func TestFindPathMixed(t *testing.T) {
 
 	x = program{1, 2, 3}
 	y = program{1, 4, 3}
-	graph = findMatchPoints(x, y)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = 2
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -156,8 +116,7 @@ func TestFindPathMixed(t *testing.T) {
 
 	x = program{'a', 'b', 'c', 'a', 'b', 'b', 'a'}
 	y = program{'c', 'b', 'a', 'b', 'a', 'c'}
-	graph = findMatchPoints(y, x)
-	cost, p = graph.findShortestPath()
+	cost, p = findShortestPath(x, y)
 	expCost = 5
 	if cost != expCost || p == nil {
 		t.Error("Expected cost", expCost, "got", cost)
@@ -168,19 +127,16 @@ func TestMerge(t *testing.T) {
 	rand.Seed(1) // Get the same behaviour every time
 	x := program{1, 2, 3, 4, 5, 6, 7, 8}
 	y := program{1, 9, 3, 0, 5, 0, 7, 0}
-	graph := findMatchPoints(y, x)
-	cost, p := graph.findShortestPath()
+	cost, p := findShortestPath(y, x)
 	t.Log("Cost between parents", cost)
 	for i := 0; i < 10; i++ {
 		newProg := p.randomMerge(x, y)
 		// Compare the child program to each of the parents. The difference to them should be
 		// less or same compared to the difference between the parents
-		graph := findMatchPoints(x, newProg)
-		newCost1, _ := graph.findShortestPath()
+		newCost1, _ := findShortestPath(x, newProg)
 		t.Log("Child prog", newProg, "cost", newCost1)
 
-		graph = findMatchPoints(y, newProg)
-		newCost2, _ := graph.findShortestPath()
+		newCost2, _ := findShortestPath(y, newProg)
 		if newCost1+newCost2 != cost {
 			t.Error("Invalid cost", newCost1, "+", newCost2, "!=", cost)
 		}
@@ -189,14 +145,18 @@ func TestMerge(t *testing.T) {
 }
 
 func TestDiffLong(t *testing.T) {
-	x := program{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	// x := program{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	// y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	// x := program{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0}
 	// y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	// x := program{0, 1, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0}
-	// y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	cost := findShortestPath2(x, y)
-	t.Log("Cost", cost)
+	x := program{0, 1, 0, 0, 0, 2, 0, 0, 3, 4, 0, 0, 0}
+	y := program{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	// x := program{0, 0, 1, 1}
+	// y := program{0, 0, 0, 0}
+	cost, list := findShortestPath2(x, y)
+	t.Log("Cost", cost, "vector length", len(list))
+	p := interpretPath(x, y, list)
+	t.Log(p)
 }
 
 func TestMergeLong(t *testing.T) {
@@ -214,9 +174,7 @@ func TestMergeLong(t *testing.T) {
 			numDiffs++
 		}
 	}
-	graph := findMatchPoints(y, x)
-	t.Log("Graph:", graph)
-	cost, p := graph.findShortestPath()
+	cost, p := findShortestPath(y, x)
 	t.Log("Path:", p)
 	if cost != numDiffs*2 {
 		t.Error("Cost was", cost, "but expected cost was", numDiffs*2)
